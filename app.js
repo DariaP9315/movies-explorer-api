@@ -4,11 +4,14 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
+const cors = require('cors');
 
 const router = require('./routes/index');
 const {
   PORT,
   DB_URL,
+  corsMethods,
+  corsHeaders,
   errorMessages,
 } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -29,6 +32,14 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors({
+  origin: '*',
+  methods: corsMethods,
+  allowedHeaders: corsHeaders,
+  credentials: true,
+  optionsSuccessStatus: 200,
+}));
+app.options('*', cors());
 
 app.get('/crash-test', () => {
   setTimeout(() => {
