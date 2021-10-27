@@ -28,6 +28,12 @@ const validateMovieSchema = celebrate({
   }),
 });
 
+const validateMovieId = celebrate({
+  params: Joi.object().keys({
+    movieId: Joi.string().required().hex().length(24),
+  }),
+});
+
 const validateUserSchema = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -52,6 +58,7 @@ const validateUserUpdate = celebrate({
 
 module.exports = {
   validateMovieSchema,
+  validateMovieId,
   validateUserSchema,
   validateUserLogin,
   validateUserUpdate,
