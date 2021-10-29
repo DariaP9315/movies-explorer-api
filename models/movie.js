@@ -31,7 +31,7 @@ const movieSchema = new mongoose.Schema({
       validator: (link) => {
         validator.isURL(link, { protocols: ['http', 'https'], require_protocol: true });
       },
-      message: errorMessages.invalidEmail,
+      message: 'Invalid URL.',
     },
   },
   trailer: {
@@ -41,7 +41,7 @@ const movieSchema = new mongoose.Schema({
       validator: (link) => {
         validator.isURL(link, { protocols: ['http', 'https'], require_protocol: true });
       },
-      message: errorMessages.invalidEmail,
+      message: 'Invalid URL.',
     },
   },
   thumbnail: {
@@ -51,7 +51,7 @@ const movieSchema = new mongoose.Schema({
       validator: (link) => {
         validator.isURL(link, { protocols: ['http', 'https'], require_protocol: true });
       },
-      message: errorMessages.invalidEmail,
+      message: 'Invalid URL.',
     },
   },
   owner: {
