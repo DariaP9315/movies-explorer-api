@@ -5,7 +5,7 @@ const BadRequestError = require('../errors/bad-request-err'); // 400
 const { errorMessages } = require('../utils/constants');
 
 const methodValidation = (value) => {
-  const method = validator.isURL(value, { protocols: ['http', 'https'], require_protocol: true });
+  const method = validator.isURL(value);
   if (!method) {
     return new BadRequestError(errorMessages.incorrectData);
   }
