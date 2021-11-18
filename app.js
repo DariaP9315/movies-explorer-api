@@ -13,6 +13,8 @@ const {
   corsMethods,
   corsHeaders,
   errorMessages,
+  NODE_ENV,
+  DB_SETTINGS,
 } = require('./utils/constants');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const error = require('./middlewares/error');
