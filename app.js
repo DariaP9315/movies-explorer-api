@@ -22,7 +22,10 @@ const limiter = require('./middlewares/limiter');
 
 const app = express();
 
-mongoose.connect(DB_URL, NODE_ENV === 'production' ? JSON.parse(DB_SETTINGS) : DB_SETTINGS);
+mongoose.connect(DB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 
 app.use(requestLogger);
