@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
-const cors = require('cors');
+const cors = require('./middlewares/cors');
 
 const router = require('./routes/index');
 const {
@@ -32,14 +32,7 @@ app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: '*',
-  methods: corsMethods,
-  allowedHeaders: corsHeaders,
-  credentials: true,
-  optionsSuccessStatus: 200,
-}));
-app.options('*', cors());
+app.use(cors);
 app.use(cookieParser());
 
 app.get('/crash-test', () => {
