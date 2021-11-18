@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
-const cors = require('cors');
+const cors = require('./middlewares/cors');
 
 const router = require('./routes/index');
 const {
@@ -20,10 +20,8 @@ const limiter = require('./middlewares/limiter');
 
 const app = express();
 
-mongoose.connect(DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(DB_URL, NODE_ENV === 'production' ? JSON.parse(DB_SETTINGS) : DB_SETTINGS);
+
 
 app.use(requestLogger);
 
@@ -31,7 +29,6 @@ app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.use(cors({
   origin: '*',
   methods: corsMethods,
@@ -40,6 +37,7 @@ app.use(cors({
   optionsSuccessStatus: 200,
 }));
 app.options('*', cors());
+app.use(cookieParser());
 
 app.get('/crash-test', () => {
   setTimeout(() => {
