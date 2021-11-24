@@ -4,7 +4,7 @@
 # Бэкенд для дипломного проекта "Movies Explorer" 
 
 ## Ссылки:
-* **Ссылка на бэкенд:** https://api.movie-explorer.popova.nomoredomains.club,
+* **Ссылка на бэкенд:** https://api.movie-explorer.popova.nomoredomains.rocks,
 
 * **Публичный IP:** 51.250.18.170
 
