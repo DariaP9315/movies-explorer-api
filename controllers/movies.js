@@ -1,19 +1,21 @@
 const Movie = require('../models/movie');
 
-const BadRequestError = require('../errors/bad-request-err'); // 400
-const ForbiddenError = require('../errors/forbidden-err'); // 403
-const NotFoundError = require('../errors/not-found-err'); // 404
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-const { errorMessages } = require('../utils/constants');
-
-module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
-    .then((movies) => res.send(movies))
+const getMovies = (req, res, next) => {
+  Movie.find({ owner: req.user._id })
+    .then((movies) => {
+      if (!movies) {
+        throw new NotFoundError('Фильмы не найдены');
+      }
+      res.send(movies);
+    })
     .catch(next);
 };
 
-module.exports.createMovie = (req, res, next) => {
-  const owner = req.user._id;
+const createMovie = (req, res, next) => {
   const {
     country,
     director,
@@ -40,36 +42,38 @@ module.exports.createMovie = (req, res, next) => {
     movieId,
     nameRU,
     nameEN,
-    owner,
+    owner: req.user._id,
   })
     .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(errorMessages.incorrectDataMovieCreate);
+        throw new BadRequestError('Неверено задано одно из полей');
       }
       next(err);
     })
     .catch(next);
 };
 
-module.exports.deleteMovie = (req, res, next) => {
+const removeMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
+    .orFail(new NotFoundError('Фильм с указанным id не найден'))
     .then((movie) => {
-      if (movie === null) {
-        throw new NotFoundError(errorMessages.notFoundMovieId);
-      }
       if (movie.owner.toString() !== req.user._id) {
-        throw new ForbiddenError(errorMessages.notEnoughRightsMovieDelete);
-      } else {
-        Movie.deleteOne(movie)
-          .then(() => res.send(movie));
+        throw new ForbiddenError('Недостаточно прав для удаления');
       }
+      return movie.remove()
+        .then(() => res.send({ message: 'Фильм удален' }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError(errorMessages.incorrectData);
+        throw new BadRequestError('Передан некорректный id');
       }
       next(err);
-    })
-    .catch(next);
+    });
+};
+
+module.exports = {
+  getMovies,
+  createMovie,
+  removeMovie,
 };

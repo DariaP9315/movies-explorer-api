@@ -1,25 +1,23 @@
 const router = require('express').Router();
 
-const usersRoute = require('./users');
-const moviesRoute = require('./movies');
-const { createUser, login, logout } = require('../controllers/users');
+const { createUser, login } = require('../controllers/users');
+const userRouter = require('./users');
+const movieRouter = require('./movies');
+
 const auth = require('../middlewares/auth');
-const { validateUserSchema, validateUserLogin } = require('../middlewares/validation');
+const { validateRegister, validateLogin } = require('../middlewares/validation');
+const NotFoundError = require('../errors/NotFoundError');
 
-const NotFoundError = require('../errors/not-found-err'); // 404
-const { errorMessages } = require('../utils/constants');
-
-router.post('/signup', validateUserSchema, createUser);
-router.post('/signin', validateUserLogin, login);
+router.post('/signup', validateRegister, createUser);
+router.post('/signin', validateLogin, login);
 
 router.use(auth);
 
-router.delete('/signout', logout);
-router.use('/users', usersRoute);
-router.use('/movies', moviesRoute);
+router.use(userRouter);
+router.use(movieRouter);
 
 router.use('*', () => {
-  throw new NotFoundError(errorMessages.notFoundError);
+  throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
 
 module.exports = router;

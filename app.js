@@ -1,57 +1,47 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const helmet = require('helmet');
 const cors = require('cors');
+const helmet = require('helmet');
+require('dotenv').config();
 
 const router = require('./routes/index');
-const {
-  PORT,
-  DB_URL,
-  corsMethods,
-  corsHeaders,
-  errorMessages,
-} = require('./utils/constants');
+
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const error = require('./middlewares/error');
-const limiter = require('./middlewares/limiter');
+const errorHandler = require('./middlewares/errorHandler');
+const limiter = require('./middlewares/rateLimiter');
+
+const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/moviesdb' } = process.env;
 
 const app = express();
-
-mongoose.connect(DB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 
 app.use(requestLogger);
 
 app.use(limiter);
-app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: '*',
-  methods: corsMethods,
-  allowedHeaders: corsHeaders,
-  credentials: true,
-  optionsSuccessStatus: 200,
-}));
-app.options('*', cors());
-app.use(cookieParser());
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error(errorMessages.serverCrashError);
-  }, 0);
-});
+app.use(cors());
+
+app.use(helmet());
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(router);
 
 app.use(errorLogger);
-app.use(errors());
-app.use(error);
 
-app.listen(PORT);
+app.use(errors());
+
+app.use(errorHandler);
+
+mongoose.connect(MONGO_URL, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true,
+});
+
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
+});

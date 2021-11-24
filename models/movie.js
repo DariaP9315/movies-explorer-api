@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const { errorMessages } = require('../utils/constants');
-
 const movieSchema = new mongoose.Schema({
   country: {
     type: String,
@@ -25,28 +23,20 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   image: {
-    type: String,
+    type: Object,
     required: true,
-    validate: {
-      validator: (v) => validator.isURL(v),
-      message: (props) => `${props.value} is not a valid URL!`,
-    },
   },
   trailer: {
     type: String,
     required: true,
     validate: {
       validator: (v) => validator.isURL(v),
-      message: (props) => `${props.value} is not a valid URL!`,
+      message: 'Некорректный URL',
     },
   },
   thumbnail: {
     type: String,
     required: true,
-    validate: {
-      validator: (v) => validator.isURL(v),
-      message: (props) => `${props.value} is not a valid URL!`,
-    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -56,7 +46,6 @@ const movieSchema = new mongoose.Schema({
   movieId: {
     type: Number,
     required: true,
-    select: false,
   },
   nameRU: {
     type: String,
@@ -66,7 +55,6 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-},
-{ versionKey: false });
+});
 
 module.exports = mongoose.model('movie', movieSchema);
